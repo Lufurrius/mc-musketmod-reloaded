@@ -7,7 +7,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
@@ -23,11 +23,11 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
 public class VanillaHelper {
-    public static void modifyLootTableItems(ResourceLocation location, LootContext context, Consumer<ItemStack> adder) {
-        if (location.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
+    public static void modifyLootTableItems(Identifier location, LootContext context, Consumer<ItemStack> adder) {
+        if (location.getNamespace().equals(Identifier.DEFAULT_NAMESPACE)) {
             ResourceKey<LootTable> key = ResourceKey.create(Registries.LOOT_TABLE,
                 MusketMod.resource(location.getPath()));
-            context.getResolver().get(Registries.LOOT_TABLE, key).ifPresent(modTable -> {
+            context.getResolver().get(key).ifPresent(modTable -> {
                 modTable.value().getRandomItemsRaw(context,
                     LootTable.createStackSplitter(context.getLevel(), adder));
             });
@@ -37,8 +37,8 @@ public class VanillaHelper {
     public static boolean canEnchant(Holder<Enchantment> enchantment, ItemStack stack) {
         if (stack.getItem() instanceof GunItem && enchantment.kind() == Holder.Kind.REFERENCE) {
             ResourceKey<Enchantment> key = enchantment.unwrapKey().get();
-            if (key.location().getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
-                String tagPath = "enchantable/" + key.location().getPath();
+            if (key.identifier().getNamespace().equals(Identifier.DEFAULT_NAMESPACE)) {
+                String tagPath = "enchantable/" + key.identifier().getPath();
                 TagKey<Item> tag = TagKey.create(Registries.ITEM, MusketMod.resource(tagPath));
                 return stack.is(tag);
             }

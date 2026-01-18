@@ -7,17 +7,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import ewewukek.musketmod.ILootTableId;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 @Mixin(ReloadableServerRegistries.Holder.class)
 abstract class ReloadableServerRegistriesHolderMixin {
-    private ResourceLocation location;
+    private Identifier location;
 
     @Inject(method = "getLootTable", at = @At("HEAD"))
     private void getLootTableHead(ResourceKey<LootTable> key, CallbackInfoReturnable<LootTable> ci) {
-        location = key.location();
+        location = key.identifier();
     }
 
     @Inject(method = "getLootTable", at = @At("RETURN"))

@@ -1,0 +1,15 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "minecraft:has_component",
+    "component": "musketmod:loaded",
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "musketmod:item/pistol_loaded"
+    },
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "musketmod:item/pistol"
+    }
+  }
+}

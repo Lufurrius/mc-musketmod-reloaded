@@ -4,32 +4,34 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SmithingTemplateItem;
 
 public class Items {
-    public static final Item MUSKET = new MusketItem(new Item.Properties()
+    public static final Item MUSKET = new MusketItem(itemProperties("musket")
         .durability(Config.musketDurability));
-    public static final Item MUSKET_WITH_BAYONET = new MusketItem(new Item.Properties()
+    public static final Item MUSKET_WITH_BAYONET = new MusketItem(itemProperties("musket_with_bayonet")
         .durability(Config.musketDurability)
         .attributes(MusketItem.createBayonetAttributes()));
-    public static final Item MUSKET_WITH_SCOPE = new ScopedMusketItem(new Item.Properties()
+    public static final Item MUSKET_WITH_SCOPE = new ScopedMusketItem(itemProperties("musket_with_scope")
         .durability(Config.scopedMusketDurability));
-    public static final Item BLUNDERBUSS = new BlunderbussItem(new Item.Properties()
+    public static final Item BLUNDERBUSS = new BlunderbussItem(itemProperties("blunderbuss")
         .durability(Config.blunderbussDurability));
-    public static final Item PISTOL = new PistolItem(new Item.Properties()
+    public static final Item PISTOL = new PistolItem(itemProperties("pistol")
         .durability(Config.pistolDurability));
-    public static final Item CARTRIDGE = new CartridgeItem(new Item.Properties());
+    public static final Item CARTRIDGE = new CartridgeItem(itemProperties("cartridge"));
 
-    public static final ResourceLocation EMPTY_SLOT_MUSKET = MusketMod.resource("item/empty_slot_musket");
-    public static final ResourceLocation EMPTY_SLOT_SPYGLASS = ResourceLocation.withDefaultNamespace("item/empty_slot_spyglass");
+    public static final Identifier EMPTY_SLOT_MUSKET = MusketMod.resource("item/empty_slot_musket");
+    public static final Identifier EMPTY_SLOT_SPYGLASS = Identifier.withDefaultNamespace("item/empty_slot_spyglass");
+    public static final Identifier EMPTY_SLOT_SWORD = Identifier.withDefaultNamespace("item/empty_slot_sword");
 
     public static final Item MUSKET_UPGRADE = new SmithingTemplateItem(
         Component.translatable(Util.makeDescriptionId("item",
@@ -39,15 +41,17 @@ public class Items {
             MusketMod.resource("musket_upgrade.ingredients")))
             .withStyle(SmithingTemplateItem.DESCRIPTION_FORMAT),
         Component.translatable(Util.makeDescriptionId("item",
-            MusketMod.resource("musket_upgrade")))
-            .withStyle(SmithingTemplateItem.TITLE_FORMAT),
-        Component.translatable(Util.makeDescriptionId("item",
             MusketMod.resource("musket_upgrade.base_slot_description"))),
         Component.translatable(Util.makeDescriptionId("item",
             MusketMod.resource("musket_upgrade.additions_slot_description"))),
         List.of(EMPTY_SLOT_MUSKET),
-        List.of(SmithingTemplateItem.EMPTY_SLOT_SWORD, EMPTY_SLOT_SPYGLASS)
+        List.of(EMPTY_SLOT_SWORD, EMPTY_SLOT_SPYGLASS),
+        itemProperties("musket_upgrade_smithing_template")
     );
+
+    private static Item.Properties itemProperties(String id) {
+        return new Item.Properties().setId(ResourceKey.create(Registries.ITEM, MusketMod.resource(id)));
+    }
 
     public static void registerDataComponentTypes(BiConsumer<String, DataComponentType<?>> helper) {
         helper.accept("loaded", GunItem.LOADED);

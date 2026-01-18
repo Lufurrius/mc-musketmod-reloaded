@@ -16,9 +16,6 @@
     ],
     "client": [
       "ewewukek.musketmod.ClientSetup"
-    ],
-    "modmenu": [
-      "ewewukek.musketmod.ModMenuIntegration"
     ]
   },
   "accessWidener": "musketmod.aw",

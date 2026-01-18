@@ -6,7 +6,7 @@ import java.util.concurrent.Executor;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -38,8 +38,8 @@ public class MusketMod {
     public static final String MODID = "musketmod";
     public static final Path CONFIG_PATH = FMLPaths.CONFIGDIR.get().resolve("musketmod.txt");
 
-    public static ResourceLocation resource(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    public static Identifier resource(String path) {
+        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 
     private static final int PROTOCOL_VERSION = 2;

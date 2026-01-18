@@ -4,55 +4,66 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
-public class BulletRenderer extends EntityRenderer<BulletEntity> {
-    public static final ResourceLocation TEXTURE = MusketMod.resource("textures/entity/bullet.png");
-    public static final ResourceLocation TEXTURE_FIRE = MusketMod.resource("textures/entity/bullet_fire.png");
+public class BulletRenderer extends EntityRenderer<BulletEntity, BulletRenderer.BulletRenderState> {
+    public static final Identifier TEXTURE = MusketMod.resource("textures/entity/bullet.png");
+    public static final Identifier TEXTURE_FIRE = MusketMod.resource("textures/entity/bullet_fire.png");
 
     public BulletRenderer(EntityRendererProvider.Context context) {
         super(context);
     }
 
     @Override
-    public ResourceLocation getTextureLocation(BulletEntity bullet) {
-        return TEXTURE;
+    public BulletRenderState createRenderState() {
+        return new BulletRenderState();
     }
 
     @Override
-    public void render(BulletEntity bullet, float yaw, float dt, PoseStack poseStack, MultiBufferSource bufferSource, int light) {
-        if (bullet.isFirstTick()) return;
+    public void extractRenderState(BulletEntity bullet, BulletRenderState state, float partialTick) {
+        super.extractRenderState(bullet, state, partialTick);
+        state.isFirstTick = bullet.isFirstTick();
+        state.pelletCount = bullet.pelletCount();
+        state.isOnFire = bullet.isOnFire();
+    }
+
+    @Override
+    public void submit(BulletRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
+        if (state.isFirstTick) return;
+
+        int light = state.lightCoords;
 
         poseStack.pushPose();
 
-        if (bullet.pelletCount() == 1) {
+        if (state.pelletCount == 1) {
             poseStack.scale(0.1f, 0.1f, 0.1f);
         } else {
-            poseStack.scale(bullet.isOnFire() ? 0.075f : 0.05f, 0.05f, 0.05f);
+            poseStack.scale(state.isOnFire ? 0.075f : 0.05f, 0.05f, 0.05f);
         }
 
-        // billboarding
-        poseStack.mulPose(entityRenderDispatcher.cameraOrientation());
+        // billboarding - use camera rotation from render state
+        poseStack.mulPose(cameraRenderState.orientation);
         poseStack.mulPose(Axis.YP.rotationDegrees(180));
 
-        PoseStack.Pose pose = poseStack.last();
-        RenderType renderType = RenderType.entityCutoutNoCull(
-            bullet.isOnFire() ? TEXTURE_FIRE : TEXTURE);
-        VertexConsumer builder = bufferSource.getBuffer(renderType);
-
-        addVertex(builder, pose, -1, -1, 0, 0, 1, 0, 0, 1, light);
-        addVertex(builder, pose,  1, -1, 0, 1, 1, 0, 0, 1, light);
-        addVertex(builder, pose,  1,  1, 0, 1, 0, 0, 0, 1, light);
-        addVertex(builder, pose, -1,  1, 0, 0, 0, 0, 0, 1, light);
+        Identifier texture = state.isOnFire ? TEXTURE_FIRE : TEXTURE;
+        
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityCutoutNoCull(texture), (pose, builder) -> {
+            addVertex(builder, pose, -1, -1, 0, 0, 1, 0, 0, 1, light);
+            addVertex(builder, pose,  1, -1, 0, 1, 1, 0, 0, 1, light);
+            addVertex(builder, pose,  1,  1, 0, 1, 0, 0, 0, 1, light);
+            addVertex(builder, pose, -1,  1, 0, 0, 0, 0, 0, 1, light);
+        });
 
         poseStack.popPose();
 
-        super.render(bullet, yaw, dt, poseStack, bufferSource, light);
+        super.submit(state, poseStack, submitNodeCollector, cameraRenderState);
     }
 
     void addVertex(VertexConsumer builder, PoseStack.Pose pose, float x, float y, float z, float u, float v, float nx, float ny, float nz, int light) {
@@ -62,5 +73,11 @@ public class BulletRenderer extends EntityRenderer<BulletEntity> {
                .setOverlay(OverlayTexture.NO_OVERLAY)
                .setLight(light)
                .setNormal(pose, nx, ny, nz);
+    }
+
+    public static class BulletRenderState extends EntityRenderState {
+        public boolean isFirstTick;
+        public int pelletCount;
+        public boolean isOnFire;
     }
 }

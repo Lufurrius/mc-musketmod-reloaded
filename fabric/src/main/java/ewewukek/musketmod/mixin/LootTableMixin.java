@@ -8,18 +8,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ewewukek.musketmod.ILootTableId;
 import ewewukek.musketmod.VanillaHelper;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 @Mixin(LootTable.class)
 abstract class LootTableMixin implements ILootTableId {
-    private ResourceLocation location;
+    private Identifier location;
     private LootContext context;
 
     @Override
-    public void setLocation(ResourceLocation location) {
+    public void setLocation(Identifier location) {
         this.location = location;
     }
 

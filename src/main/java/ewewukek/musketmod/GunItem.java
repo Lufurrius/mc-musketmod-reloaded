@@ -16,14 +16,14 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -156,26 +156,26 @@ public abstract class GunItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (!canUse(player) || !canUseFrom(player, hand)) {
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
 
         if (isLoaded(stack)) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 Vec3 direction = Vec3.directionFromRotation(player.getXRot(), player.getYRot());
                 fire(player, stack, direction, smokeOffsetFor(player, hand));
             }
             player.playSound(fireSound(stack), 3.5f, 1);
 
             setLoaded(stack, false);
-            stack.hurtAndBreak(1, player, Player.getSlotForHand(hand));
+            stack.hurtAndBreak(1, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
 
             player.releaseUsingItem();
-            if (level.isClientSide) setActiveStack(hand, stack);
+            if (level.isClientSide()) setActiveStack(hand, stack);
 
-            return InteractionResultHolder.consume(stack);
+            return InteractionResult.CONSUME;
 
         } else if (hand == InteractionHand.MAIN_HAND) {
             // shoot from offhand if it's loaded
@@ -183,13 +183,13 @@ public abstract class GunItem extends Item {
             if (offhandStack.getItem() instanceof GunItem offhandGun && isLoaded(offhandStack)
             && offhandGun.canUseFrom(player, InteractionHand.OFF_HAND)) {
 
-                return InteractionResultHolder.pass(stack);
+                return InteractionResult.PASS;
             }
         }
 
         if (getLoadingStage(stack) == 0) {
             if (!checkAmmo(player, stack)) {
-                return InteractionResultHolder.fail(stack);
+                return InteractionResult.FAIL;
             }
             setLoadingStage(stack, 1);
 
@@ -201,12 +201,12 @@ public abstract class GunItem extends Item {
 
         player.startUsingItem(hand);
 
-        return InteractionResultHolder.consume(stack);
+        return InteractionResult.CONSUME;
     }
 
     @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.CROSSBOW;
+    public ItemUseAnimation getUseAnimation(ItemStack stack) {
+        return ItemUseAnimation.CROSSBOW;
     }
 
     public static Vec3 addSpread(Vec3 direction, RandomSource random, float spreadStdDev) {
@@ -263,7 +263,7 @@ public abstract class GunItem extends Item {
     public static void mobReload(LivingEntity entity, InteractionHand hand) {
         if (entity.isUsingItem()) return;
         Level level = entity.level();
-        if (level.isClientSide) return;
+        if (level.isClientSide()) return;
         ItemStack stack = entity.getItemInHand(hand);
         if (isLoaded(stack)) return;
 
@@ -280,7 +280,7 @@ public abstract class GunItem extends Item {
 
     public void mobUse(LivingEntity entity, ItemStack stack, Vec3 direction, Vec3 smokeOffset) {
         Level level = entity.level();
-        if (level.isClientSide) return;
+        if (level.isClientSide()) return;
         if (!isLoaded(stack)) return;
 
         fire(entity, stack, direction, smokeOffset);
@@ -314,7 +314,7 @@ public abstract class GunItem extends Item {
     }
 
     @Override
-    public void releaseUsing(ItemStack stack, Level level, LivingEntity entity, int ticksLeft) {
+    public boolean releaseUsing(ItemStack stack, Level level, LivingEntity entity, int ticksLeft) {
         if (isLoaded(stack)) {
             setLoadingStage(stack, 0);
 
@@ -334,6 +334,7 @@ public abstract class GunItem extends Item {
             }
             setLoadingStage(stack, loadingStage);
         }
+        return true;
     }
 
     @Override
@@ -357,7 +358,7 @@ public abstract class GunItem extends Item {
             }
         }
 
-        if (level.isClientSide && entity instanceof Player) {
+        if (level.isClientSide() && entity instanceof Player) {
             setActiveStack(entity.getUsedItemHand(), stack);
             return;
         }
@@ -372,13 +373,10 @@ public abstract class GunItem extends Item {
         }
     }
 
-    @Override
-    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity entity) {
+    public void hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity entity) {
         stack.hurtAndBreak(hitDurabilityDamage(), entity, EquipmentSlot.MAINHAND);
-        return false;
     }
 
-    @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState blockState, BlockPos blockPos, LivingEntity entity) {
         if (blockState.getDestroySpeed(level, blockPos) != 0) {
             stack.hurtAndBreak(hitDurabilityDamage(), entity, EquipmentSlot.MAINHAND);
@@ -386,12 +384,10 @@ public abstract class GunItem extends Item {
         return false;
     }
 
-    @Override
     public int getUseDuration(ItemStack stack, LivingEntity entity) {
         return 72000;
     }
 
-    @Override
     public int getEnchantmentValue() {
         return 14;
     }
@@ -448,7 +444,7 @@ public abstract class GunItem extends Item {
     // COMPAT: Wastelands of Baedoor
     public static void increaseGunExperience(Player player) {
         final String NAME = "gun_experience";
-        Scoreboard board = player.getScoreboard();
+        Scoreboard board = player.level().getScoreboard();
         Objective objective = board.getObjective(NAME);
         if (objective == null) {
             objective = board.addObjective(NAME, ObjectiveCriteria.DUMMY, Component.literal(NAME),

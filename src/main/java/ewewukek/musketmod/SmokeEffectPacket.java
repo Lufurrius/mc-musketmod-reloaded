@@ -1,6 +1,7 @@
 package ewewukek.musketmod;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -8,7 +9,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.phys.Vec3;
 
-public record SmokeEffectPacket(Vector3f origin, Vector3f direction) implements CustomPacketPayload {
+public record SmokeEffectPacket(Vector3fc origin, Vector3fc direction) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<SmokeEffectPacket> TYPE =
         new CustomPacketPayload.Type<>(MusketMod.resource("smoke"));
     public static final StreamCodec<ByteBuf, SmokeEffectPacket> CODEC =

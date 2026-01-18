@@ -8,42 +8,42 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ewewukek.musketmod.ClientUtilities;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.HumanoidModel.ArmPose;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 
 @Mixin(HumanoidModel.class)
 abstract class HumanoidModelMixin {
-    private LivingEntity entity;
+    private HumanoidRenderState state;
     private ArmPose leftArmPose;
     private ArmPose rightArmPose;
 
     @Inject(method = "setupAnim", at = @At("HEAD"))
-    private void setupAnimHead(LivingEntity entity, float f, float g, float h, float i, float j, CallbackInfo ci) {
-        this.entity = entity;
-        HumanoidModel<?> model = (HumanoidModel<?>)(Object)this;
-        leftArmPose = model.leftArmPose;
-        rightArmPose = model.rightArmPose;
+    private void setupAnimHead(HumanoidRenderState state, CallbackInfo ci) {
+        this.state = state;
+        leftArmPose = state.leftArmPose;
+        rightArmPose = state.rightArmPose;
     }
 
     @Inject(method = "poseRightArm", at = @At("TAIL"))
-    private void poseRightArm(CallbackInfo ci) {
+    private void poseRightArm(HumanoidRenderState state, CallbackInfo ci) {
         HumanoidModel<?> model = (HumanoidModel<?>)(Object)this;
-        if (entity != null && ClientUtilities.poseArm(entity, model, model.rightArm)) {
-            model.rightArmPose = ArmPose.SPYGLASS; // to disable AnimationUtils.bobModelPart call
+        if (ClientUtilities.poseArm(state, model, model.rightArm)) {
+            state.rightArmPose = ArmPose.SPYGLASS; // to disable AnimationUtils.bobModelPart call
         }
     }
 
     @Inject(method = "poseLeftArm", at = @At("TAIL"))
-    private void poseLeftArm(CallbackInfo ci) {
+    private void poseLeftArm(HumanoidRenderState state, CallbackInfo ci) {
         HumanoidModel<?> model = (HumanoidModel<?>)(Object)this;
-        if (entity != null && ClientUtilities.poseArm(entity, model, model.leftArm)) {
-            model.leftArmPose = ArmPose.SPYGLASS; // to disable AnimationUtils.bobModelPart call
+        if (ClientUtilities.poseArm(state, model, model.leftArm)) {
+            state.leftArmPose = ArmPose.SPYGLASS; // to disable AnimationUtils.bobModelPart call
         }
     }
 
     @Inject(method = "setupAnim", at = @At("TAIL"))
     private void setupAnimTail(CallbackInfo ci) {
-        HumanoidModel<?> model = (HumanoidModel<?>)(Object)this;
-        model.rightArmPose = rightArmPose;
-        model.leftArmPose = leftArmPose;
+        if (state != null) {
+            state.rightArmPose = rightArmPose;
+            state.leftArmPose = leftArmPose;
+        }
     }
 }

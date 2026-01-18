@@ -1,0 +1,33 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "minecraft:has_component",
+    "component": "musketmod:loading_stage",
+    "on_true": {
+      "type": "minecraft:condition",
+      "property": "minecraft:has_component",
+      "component": "musketmod:loaded",
+      "on_true": {
+        "type": "minecraft:model",
+        "model": "musketmod:item/musket_loading_loaded"
+      },
+      "on_false": {
+        "type": "minecraft:model",
+        "model": "musketmod:item/musket_loading"
+      }
+    },
+    "on_false": {
+      "type": "minecraft:condition",
+      "property": "minecraft:has_component",
+      "component": "musketmod:loaded",
+      "on_true": {
+        "type": "minecraft:model",
+        "model": "musketmod:item/musket_loaded"
+      },
+      "on_false": {
+        "type": "minecraft:model",
+        "model": "musketmod:item/musket"
+      }
+    }
+  }
+}

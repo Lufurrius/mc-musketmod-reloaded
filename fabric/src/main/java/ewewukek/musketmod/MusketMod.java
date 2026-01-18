@@ -18,13 +18,13 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.PreparableReloadListener.PreparationBarrier;
+import net.minecraft.server.packs.resources.PreparableReloadListener.SharedState;
 import net.minecraft.util.Unit;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.phys.Vec3;
@@ -33,8 +33,8 @@ public class MusketMod implements ModInitializer {
     public static final String MODID = "musketmod";
     public static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("musketmod.txt");
 
-    public static ResourceLocation resource(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+    public static Identifier resource(String path) {
+        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class MusketMod implements ModInitializer {
             });
         });
         Sounds.register((sound) -> {
-            Registry.register(BuiltInRegistries.SOUND_EVENT, sound.getLocation(), sound);
+            Registry.register(BuiltInRegistries.SOUND_EVENT, sound.location(), sound);
         });
         BulletEntity.register((string, entityType) -> {
             Registry.register(BuiltInRegistries.ENTITY_TYPE, resource(string), entityType);
@@ -78,18 +78,14 @@ public class MusketMod implements ModInitializer {
 
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override
-            public ResourceLocation getFabricId() {
+            public Identifier getFabricId() {
                 return resource("reload");
             }
 
             @Override
-            public CompletableFuture<Void> reload(PreparationBarrier stage, ResourceManager resourceManager,
-                ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor,
-                Executor gameExecutor) {
-
-                return stage.wait(Unit.INSTANCE).thenRunAsync(() -> {
-                    Config.load();
-                }, gameExecutor);
+            public CompletableFuture<Void> reload(SharedState sharedState, Executor backgroundExecutor,
+                PreparationBarrier stage, Executor gameExecutor) {
+                return stage.wait(Unit.INSTANCE).thenRunAsync(Config::load, gameExecutor);
             }
         });
     }

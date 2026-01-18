@@ -1,7 +1,7 @@
 package ewewukek.musketmod;
 
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -34,11 +34,11 @@ public class ScopedMusketItem extends MusketItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         boolean wasLoaded = GunItem.isLoaded(player.getItemInHand(hand));
-        InteractionResultHolder<ItemStack> result = super.use(level, player, hand);
+        InteractionResult result = super.use(level, player, hand);
 
-        if (level.isClientSide && wasLoaded && result.getResult().consumesAction()) {
+        if (level.isClientSide() && wasLoaded && result.consumesAction()) {
             ScopedMusketItem.recoilTicks = ScopedMusketItem.RECOIL_TICKS;
         }
         return result;

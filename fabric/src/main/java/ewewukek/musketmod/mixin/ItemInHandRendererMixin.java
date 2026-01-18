@@ -11,16 +11,16 @@ import ewewukek.musketmod.ClientUtilities;
 import ewewukek.musketmod.GunItem;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(ItemInHandRenderer.class)
 abstract class ItemInHandRendererMixin {
     @Inject(method = "renderArmWithItem", at = @At(value = "HEAD"), cancellable = true)
-    private void renderArmWithItem(AbstractClientPlayer player, float tickDelta, float pitch, InteractionHand hand, float swingProgress, ItemStack stack, float equipProgress, PoseStack matrices, MultiBufferSource vertexConsumers, int light, CallbackInfo ci) {
+    private void renderArmWithItem(AbstractClientPlayer player, float tickDelta, float pitch, InteractionHand hand, float swingProgress, ItemStack stack, float equipProgress, PoseStack matrices, SubmitNodeCollector submitNodeCollector, int light, CallbackInfo ci) {
         if (stack.getItem() instanceof GunItem) {
-            ClientUtilities.renderGunInHand((ItemInHandRenderer)(Object)this, player, hand, tickDelta, pitch, swingProgress, equipProgress, stack, matrices,vertexConsumers, light);
+            ClientUtilities.renderGunInHand((ItemInHandRenderer)(Object)this, player, hand, tickDelta, pitch, swingProgress, equipProgress, stack, matrices, submitNodeCollector, light);
             ci.cancel();
         }
     }

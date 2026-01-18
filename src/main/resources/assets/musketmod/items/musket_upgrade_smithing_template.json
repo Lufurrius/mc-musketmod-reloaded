@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "musketmod:item/musket_upgrade_smithing_template"
+  }
+}

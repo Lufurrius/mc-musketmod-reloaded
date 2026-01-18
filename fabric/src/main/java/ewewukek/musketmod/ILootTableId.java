@@ -1,7 +1,7 @@
 package ewewukek.musketmod;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface ILootTableId {
-    void setLocation(ResourceLocation location);
+    void setLocation(Identifier location);
 }

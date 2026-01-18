@@ -11,17 +11,16 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
-import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.monster.Pillager;
+import net.minecraft.world.entity.monster.illager.Pillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -29,25 +28,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class ClientUtilities {
     public static void registerItemProperties() {
-        registerItemPredicate(MusketMod.resource("loaded"), (stack, level, entity, seed) -> {
-            return GunItem.isLoaded(stack) ? 1 : 0;
-        });
-        registerItemPredicate(MusketMod.resource("loading"), (stack, level, entity, seed) -> {
-            return (entity != null && entity.isUsingItem()
-            && entity.getItemInHand(entity.getUsedItemHand()) == stack)
-                ? 1 : 0;
-        });
-        registerItemPredicate(MusketMod.resource("aiming"), (stack, level, entity, seed) -> {
-            return (entity != null && shouldAim(entity, stack)) ? 1 : 0;
-        });
-    }
-
-    public static void registerItemPredicate(ResourceLocation location, ClampedItemPropertyFunction predicate) {
-        ItemProperties.register(Items.MUSKET, location, predicate);
-        ItemProperties.register(Items.MUSKET_WITH_BAYONET, location, predicate);
-        ItemProperties.register(Items.MUSKET_WITH_SCOPE, location, predicate);
-        ItemProperties.register(Items.BLUNDERBUSS, location, predicate);
-        ItemProperties.register(Items.PISTOL, location, predicate);
+        // Item model property registration moved to data-driven model properties in 1.21.11.
     }
 
     public static void handleSmokeEffectPacket(SmokeEffectPacket packet) {
@@ -73,34 +54,53 @@ public class ClientUtilities {
         if (!scoping) ScopedMusketItem.recoilTicks = 0;
     }
 
-    public static boolean poseArm(LivingEntity entity, HumanoidModel<? extends LivingEntity> model, ModelPart arm) {
-        if (entity.isUsingItem() || (entity instanceof Mob mob && !mob.isAggressive())) {
+    public static boolean poseArm(HumanoidRenderState state, HumanoidModel<? extends HumanoidRenderState> model, ModelPart arm) {
+        if (state.isUsingItem) {
             return false;
         }
 
         boolean isRight = arm == model.rightArm;
-        InteractionHand hand = entity.getMainArm() == (isRight ? HumanoidArm.RIGHT : HumanoidArm.LEFT)
-            ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
-        ItemStack stack = entity.getItemInHand(hand);
-        if (stack.getItem() instanceof GunItem && shouldAim(entity, stack, hand)) {
+        boolean isMainHand = (state.mainArm == HumanoidArm.RIGHT) == isRight;
+        ItemStack stack = isRight ? state.rightHandItemStack : state.leftHandItemStack;
+        if (stack.getItem() instanceof GunItem && shouldAim(state, stack, isMainHand)) {
             arm.xRot = model.head.xRot + 0.1f - Mth.HALF_PI;
-            if (model.crouching) arm.xRot -= 0.4f;
+            if (state.isCrouching) arm.xRot -= 0.4f;
             arm.yRot = model.head.yRot + (isRight ? -0.3f : 0.3f);
             return true;
         }
 
-        InteractionHand hand2 = hand == InteractionHand.MAIN_HAND
-            ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
-        ItemStack stack2 = entity.getItemInHand(hand2);
-        if (stack2.getItem() instanceof GunItem gun2 && shouldAim(entity, stack2, hand2)
-        && (gun2.twoHanded() || stack == ItemStack.EMPTY)) {
+        ItemStack stack2 = isRight ? state.leftHandItemStack : state.rightHandItemStack;
+        boolean isMainHand2 = !isMainHand;
+        if (stack2.getItem() instanceof GunItem gun2 && shouldAim(state, stack2, isMainHand2)
+        && (gun2.twoHanded() || stack.isEmpty())) {
             arm.xRot = model.head.xRot - 1.5f;
-            if (model.crouching) arm.xRot -= 0.4f;
+            if (state.isCrouching) arm.xRot -= 0.4f;
             arm.yRot = model.head.yRot + (isRight ? -0.6f : 0.6f);
             return true;
         }
 
         return false;
+    }
+
+    public static boolean shouldAim(HumanoidRenderState state, ItemStack stack, boolean isMainHand) {
+        if (state.isUsingItem) return false;
+        if (!(stack.getItem() instanceof GunItem gun)) return false;
+        if (!isMainHand && gun.twoHanded()) return false;
+
+        if (!isMainHand) {
+            ItemStack mainStack = state.mainArm == HumanoidArm.RIGHT ? state.rightHandItemStack : state.leftHandItemStack;
+            if (mainStack.getItem() instanceof GunItem mainGun && mainGun.twoHanded()) return false;
+        }
+
+        return GunItem.isLoaded(stack) || Config.alwaysAim;
+    }
+
+    public static boolean isHoldingGun(HumanoidRenderState state) {
+        return isGun(state.leftHandItemStack) || isGun(state.rightHandItemStack);
+    }
+
+    private static boolean isGun(ItemStack stack) {
+        return !stack.isEmpty() && stack.getItem() instanceof GunItem;
     }
 
     public static boolean shouldAim(LivingEntity entity, ItemStack stack, InteractionHand hand) {
@@ -117,7 +117,7 @@ public class ClientUtilities {
         return shouldAim(entity, stack, hand);
     }
 
-    public static void renderGunInHand(ItemInHandRenderer renderer, AbstractClientPlayer player, InteractionHand hand, float dt, float pitch, float swingProgress, float equipProgress, ItemStack stack, PoseStack poseStack, MultiBufferSource bufferSource, int light) {
+    public static void renderGunInHand(ItemInHandRenderer renderer, AbstractClientPlayer player, InteractionHand hand, float dt, float pitch, float swingProgress, float equipProgress, ItemStack stack, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int light) {
         if (player.isScoping()) {
             return;
         }
@@ -131,7 +131,7 @@ public class ClientUtilities {
             poseStack.pushPose();
             poseStack.translate(sign * 0.5, -0.5 - 0.6 * equipProgress, -0.7);
             poseStack.mulPose(Axis.XP.rotationDegrees(70));
-            renderer.renderItem(player, stack, isRightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, !isRightHand, poseStack, bufferSource, light);
+            renderer.renderItem(player, stack, isRightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, poseStack, submitNodeCollector, light);
             poseStack.popPose();
             return;
         }
@@ -205,7 +205,7 @@ public class ClientUtilities {
             }
         }
 
-        renderer.renderItem(player, stack, isRightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, !isRightHand, poseStack, bufferSource, light);
+        renderer.renderItem(player, stack, isRightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, poseStack, submitNodeCollector, light);
         poseStack.popPose();
     }
 
