@@ -22,7 +22,7 @@
       "component": "musketmod:loaded",
       "on_true": {
         "type": "minecraft:model",
-        "model": "musketmod:item/musket_with_scope_loaded"
+        "model": "musketmod:item/musket_with_scope_aiming_loaded"
       },
       "on_false": {
         "type": "minecraft:model",

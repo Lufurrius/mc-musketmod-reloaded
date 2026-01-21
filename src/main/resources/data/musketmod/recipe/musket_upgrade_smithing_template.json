@@ -7,15 +7,9 @@
     "DDD"
   ],
   "key": {
-    "D": {
-      "item": "minecraft:diamond"
-    },
-    "I": {
-      "item": "minecraft:iron_block"
-    },
-    "T": {
-      "item": "musketmod:musket_upgrade_smithing_template"
-    }
+    "D": "minecraft:diamond",
+    "I": "minecraft:iron_block",
+    "T": "musketmod:musket_upgrade_smithing_template"
   },
   "result": {
     "count": 2,

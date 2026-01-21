@@ -4,21 +4,11 @@
   "cookingtime": 100,
   "experience": 0.1,
   "ingredient": [
-    {
-      "item": "musketmod:musket"
-    },
-    {
-      "item": "musketmod:musket_with_bayonet"
-    },
-    {
-      "item": "musketmod:musket_with_scope"
-    },
-    {
-      "item": "musketmod:blunderbuss"
-    },
-    {
-      "item": "musketmod:pistol"
-    }
+    "musketmod:musket",
+    "musketmod:musket_with_bayonet",
+    "musketmod:musket_with_scope",
+    "musketmod:blunderbuss",
+    "musketmod:pistol"
   ],
   "result": {
     "id": "minecraft:iron_nugget"

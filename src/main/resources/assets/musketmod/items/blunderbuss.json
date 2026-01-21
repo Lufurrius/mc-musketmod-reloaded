@@ -22,7 +22,7 @@
       "component": "musketmod:loaded",
       "on_true": {
         "type": "minecraft:model",
-        "model": "musketmod:item/blunderbuss_loaded"
+        "model": "musketmod:item/blunderbuss_aiming_loaded"
       },
       "on_false": {
         "type": "minecraft:model",

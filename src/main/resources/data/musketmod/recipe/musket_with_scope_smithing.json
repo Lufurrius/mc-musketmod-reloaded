@@ -1,14 +1,8 @@
 {
   "type": "minecraft:smithing_transform",
-  "template": {
-    "item": "musketmod:musket_upgrade_smithing_template"
-  },
-  "base": {
-    "item": "musketmod:musket"
-  },
-  "addition": {
-    "item": "minecraft:spyglass"
-  },
+  "template": "musketmod:musket_upgrade_smithing_template",
+  "base": "musketmod:musket",
+  "addition": "minecraft:spyglass",
   "result": {
     "count": 1,
     "id": "musketmod:musket_with_scope"

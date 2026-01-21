@@ -6,18 +6,10 @@
     "is"
   ],
   "key": {
-    "I": {
-      "item": "minecraft:iron_ingot"
-    },
-    "i": {
-      "item": "minecraft:iron_nugget"
-    },
-    "F": {
-      "item": "minecraft:flint_and_steel"
-    },
-    "s": {
-      "item": "minecraft:stick"
-    }
+    "I": "minecraft:iron_ingot",
+    "i": "minecraft:iron_nugget",
+    "F": "minecraft:flint_and_steel",
+    "s": "minecraft:stick"
   },
   "result": {
     "count": 1,

@@ -1,17 +1,17 @@
 modLoader="javafml"
 loaderVersion="[4,)"
 license="MIT License"
-issueTrackerURL="https://github.com/ewewukek/mc-musketmod/issues"
+issueTrackerURL="https://github.com/Lufurrius/mc-musketmod-reloaded/issues"
 
 [[mods]]
 modId="musketmod"
 version="${mod_version}"
-displayName="Musket Mod"
+displayName="Musket Mod Reloaded"
 #updateJSONURL=""
-displayURL="https://github.com/ewewukek/mc-musketmod"
+displayURL="https://github.com/Lufurrius/mc-musketmod-reloaded"
 logoFile="logo.png"
-credits="lilypuree, MikhailTapio, Xannosz, SkpC9 for their contribution"
-authors="ewewukek"
+credits="ewewukek, lilypuree, MikhailTapio, Xannosz, SkpC9 for their contribution"
+authors="Lufurrius"
 description='''
 Small mod that adds craftable muskets and pistols.
 '''
@@ -19,7 +19,7 @@ Small mod that adds craftable muskets and pistols.
 [[dependencies.musketmod]]
 modId="neoforge"
 type="required"
-versionRange="[21.1.4,)"
+versionRange="[21.11.34-beta,)"
 ordering="NONE"
 side="BOTH"
 

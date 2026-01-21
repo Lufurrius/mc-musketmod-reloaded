@@ -7,18 +7,10 @@
     " iP"
   ],
   "key": {
-    "C": {
-      "item": "minecraft:copper_ingot"
-    },
-    "i": {
-      "item": "minecraft:iron_nugget"
-    },
-    "F": {
-      "item": "minecraft:flint_and_steel"
-    },
-    "P": {
-      "tag": "minecraft:planks"
-    }
+    "C": "minecraft:copper_ingot",
+    "i": "minecraft:iron_nugget",
+    "F": "minecraft:flint_and_steel",
+    "P": "#minecraft:planks"
   },
   "result": {
     "count": 1,

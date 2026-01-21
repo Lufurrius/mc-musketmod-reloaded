@@ -5,7 +5,7 @@
     "component": "musketmod:loaded",
     "on_true": {
       "type": "minecraft:model",
-      "model": "musketmod:item/pistol_loaded"
+      "model": "musketmod:item/pistol_aiming_loaded"
     },
     "on_false": {
       "type": "minecraft:model",
