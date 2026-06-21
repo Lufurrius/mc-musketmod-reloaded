@@ -16,8 +16,8 @@ public class ModLootModifier extends LootModifier {
         .apply(instance, ModLootModifier::new)
     );
 
-    public ModLootModifier(LootItemCondition[] conditions) {
-        super(conditions);
+    public ModLootModifier(LootItemCondition[] conditions, int priority) {
+        super(conditions, priority);
     }
 
     @Override

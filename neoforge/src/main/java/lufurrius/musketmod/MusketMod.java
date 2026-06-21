@@ -116,6 +116,6 @@ public class MusketMod {
     public static void sendSmokeEffect(ServerLevel level, Vec3 origin, Vec3 direction) {
         SmokeEffectPacket packet = SmokeEffectPacket.fromVec3(origin, direction);
         BlockPos blockPos = BlockPos.containing(origin.x, origin.y, origin.z);
-        PacketDistributor.sendToPlayersTrackingChunk(level, new ChunkPos(blockPos), packet);
+        PacketDistributor.sendToPlayersTrackingChunk(level, new ChunkPos(blockPos.getX() >> 4, blockPos.getZ() >> 4), packet);
     }
 }

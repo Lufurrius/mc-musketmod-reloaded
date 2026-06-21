@@ -20,16 +20,10 @@ import net.minecraft.world.phys.EntityHitResult;
 
 @Mixin(MultiPlayerGameMode.class)
 abstract class MultiPlayerGameModeMixin {
-    @Inject(method = "interactAt", at = @At("HEAD"), cancellable = true)
-    private void interactAtHead(Player player, Entity entity, EntityHitResult hitResult, InteractionHand hand, CallbackInfoReturnable<InteractionResult> ci) {
-        if (ScopedMusketItem.isScoping) {
-            ci.setReturnValue(InteractionResult.FAIL);
-            ci.cancel();
-        }
-    }
-
+    // interact(Player, Entity, InteractionHand) and interactAt(..., EntityHitResult, ...) were
+    // merged into a single interact(Player, Entity, EntityHitResult, InteractionHand) in 26.x.
     @Inject(method = "interact", at = @At("HEAD"), cancellable = true)
-    private void interactHead(Player player, Entity entity, InteractionHand hand, CallbackInfoReturnable<InteractionResult> ci) {
+    private void interactHead(Player player, Entity entity, EntityHitResult hitResult, InteractionHand hand, CallbackInfoReturnable<InteractionResult> ci) {
         if (ScopedMusketItem.isScoping) {
             ci.setReturnValue(InteractionResult.FAIL);
             ci.cancel();

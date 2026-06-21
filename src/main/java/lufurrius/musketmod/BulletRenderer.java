@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 
@@ -54,7 +54,7 @@ public class BulletRenderer extends EntityRenderer<BulletEntity, BulletRenderer.
 
         Identifier texture = state.isOnFire ? TEXTURE_FIRE : TEXTURE;
         
-        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityCutoutNoCull(texture), (pose, builder) -> {
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(texture), (pose, builder) -> {
             addVertex(builder, pose, -1, -1, 0, 0, 1, 0, 0, 1, light);
             addVertex(builder, pose,  1, -1, 0, 1, 1, 0, 0, 1, light);
             addVertex(builder, pose,  1,  1, 0, 1, 0, 0, 0, 1, light);

@@ -17,8 +17,9 @@ import net.minecraft.world.item.ItemStack;
 
 @Mixin(ItemInHandRenderer.class)
 abstract class ItemInHandRendererMixin {
-    @Inject(method = "renderArmWithItem", at = @At(value = "HEAD"), cancellable = true)
-    private void renderArmWithItem(AbstractClientPlayer player, float tickDelta, float pitch, InteractionHand hand, float swingProgress, ItemStack stack, float equipProgress, PoseStack matrices, SubmitNodeCollector submitNodeCollector, int light, CallbackInfo ci) {
+    // renderArmWithItem was renamed to submitArmWithItem in 26.x (same parameters).
+    @Inject(method = "submitArmWithItem", at = @At(value = "HEAD"), cancellable = true)
+    private void submitArmWithItem(AbstractClientPlayer player, float tickDelta, float pitch, InteractionHand hand, float swingProgress, ItemStack stack, float equipProgress, PoseStack matrices, SubmitNodeCollector submitNodeCollector, int light, CallbackInfo ci) {
         if (stack.getItem() instanceof GunItem) {
             ClientUtilities.renderGunInHand((ItemInHandRenderer)(Object)this, player, hand, tickDelta, pitch, swingProgress, equipProgress, stack, matrices, submitNodeCollector, light);
             ci.cancel();

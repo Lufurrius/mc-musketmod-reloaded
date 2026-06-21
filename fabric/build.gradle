@@ -1,5 +1,6 @@
 plugins {
-    id 'fabric-loom' version '1.14-SNAPSHOT'
+    // Minecraft 26.x is unobfuscated: use the non-remapping Loom plugin (fully-qualified id).
+    id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
 }
 
 file("../gradle.properties").withInputStream {
@@ -28,8 +29,7 @@ loom {
     runs {
         client {
             runDir = '../run'
-            programArgs.add('--username')
-            programArgs.add('Dev')
+            programArgs('--username', 'Dev')
         }
         server {
             runDir = '../run'
@@ -43,12 +43,13 @@ repositories {
 }
 
 dependencies {
+    // Minecraft 26.x ships deobfuscated (Mojang official names), so Loom needs no
+    // 'mappings' declaration and mod dependencies are added without remapping.
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
-    modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+    implementation("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 }
@@ -62,10 +63,9 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 25
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
 }

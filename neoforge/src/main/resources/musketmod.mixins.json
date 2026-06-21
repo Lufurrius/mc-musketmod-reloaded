@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "lufurrius.musketmod.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "client": [
     "AbstractClientPlayerMixin",
     "HumanoidModelMixin",

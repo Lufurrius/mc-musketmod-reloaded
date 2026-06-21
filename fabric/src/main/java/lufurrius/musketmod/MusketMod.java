@@ -6,8 +6,8 @@ import java.util.concurrent.Executor;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.item.v1.EnchantmentEvents;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -47,14 +47,14 @@ public class MusketMod implements ModInitializer {
         Items.register((path, item) -> {
             Registry.register(BuiltInRegistries.ITEM, resource(path), item);
         });
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.COMBAT).register(entries -> {
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.COMBAT).register(output -> {
             Items.addToCreativeTab(CreativeModeTabs.COMBAT, (item) -> {
-                entries.accept(item);
+                output.accept(item);
             });
         });
-        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.INGREDIENTS).register(entries -> {
+        CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS).register(output -> {
             Items.addToCreativeTab(CreativeModeTabs.INGREDIENTS, (item) -> {
-                entries.accept(item);
+                output.accept(item);
             });
         });
         Sounds.register((sound) -> {
@@ -70,11 +70,11 @@ public class MusketMod implements ModInitializer {
                 : TriState.DEFAULT;
         });
 
-        ServerTickEvents.END_WORLD_TICK.register((world) -> {
+        ServerTickEvents.END_LEVEL_TICK.register((world) -> {
             DeferredDamage.apply();
         });
 
-        PayloadTypeRegistry.playS2C().register(SmokeEffectPacket.TYPE, SmokeEffectPacket.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(SmokeEffectPacket.TYPE, SmokeEffectPacket.CODEC);
 
         ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override

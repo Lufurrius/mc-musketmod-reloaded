@@ -1,4 +1,4 @@
-accessWidener v1 named
+accessWidener v1 official
 accessible field net/minecraft/world/entity/Mob goalSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
 accessible field net/minecraft/world/item/SmithingTemplateItem TITLE_FORMAT Lnet/minecraft/ChatFormatting;
 accessible field net/minecraft/world/item/SmithingTemplateItem DESCRIPTION_FORMAT Lnet/minecraft/ChatFormatting;

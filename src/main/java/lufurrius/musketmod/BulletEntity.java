@@ -27,6 +27,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.player.Player;
@@ -133,6 +134,11 @@ public class BulletEntity extends AbstractHurtingProjectile {
     }
 
     @Override
+    public boolean isPushedByFluid() {
+        return false;
+    }
+
+    @Override
     public void tick() {
         if (++tickCounter > LIFETIME || distanceTravelled > Config.bulletMaxDistance) {
             discard();
@@ -146,7 +152,10 @@ public class BulletEntity extends AbstractHurtingProjectile {
         Vec3 to = from.add(velocity);
 
         Vec3 waterPos = Vec3.ZERO;
-        wasTouchingWater = updateFluidHeightAndDoFluidPushing(FluidTags.WATER, 0);
+        // updateFluidInteraction() refreshes the fluid state and sets wasTouchingWater;
+        // BulletEntity overrides isPushedByFluid() to false so no current is applied (the
+        // bullet applies its own WATER_FRICTION below).
+        updateFluidInteraction();
         if (wasTouchingWater) {
             waterPos = from;
             velocity = velocity.scale(WATER_FRICTION);
@@ -329,7 +338,7 @@ public class BulletEntity extends AbstractHurtingProjectile {
         }
 
         DamageSource source = getDamageSource();
-        boolean ignite = isOnFire() && target.getType() != EntityType.ENDERMAN;
+        boolean ignite = isOnFire() && target.getType() != EntityTypes.ENDERMAN;
 
         if (pelletCount() == 1) {
             if (headshot) {
@@ -346,7 +355,7 @@ public class BulletEntity extends AbstractHurtingProjectile {
     }
 
     public boolean checkHeadshot(Entity entity, AABB aabb, Vec3 start, Vec3 end) {
-        if (pelletCount() > 1 || !entity.getType().is(HEADSHOTABLE)) {
+        if (pelletCount() > 1 || !entity.getType().builtInRegistryHolder().is(HEADSHOTABLE)) {
             return false;
         }
         double width = (aabb.maxX - aabb.minX + aabb.maxZ - aabb.minZ) / 2;
