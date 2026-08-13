@@ -5,15 +5,20 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(value = MusketMod.MODID, dist = Dist.CLIENT)
 public class ClientSetup {
-    public ClientSetup(IEventBus bus) {
+    public ClientSetup(IEventBus bus, ModContainer modContainer) {
+        modContainer.registerExtensionPoint(IConfigScreenFactory.class,
+            (container, parent) -> ClothConfigScreen.build(parent));
+
         bus.addListener(this::setup);
         bus.addListener(this::registerRenderers);
         NeoForge.EVENT_BUS.addListener(EventPriority.LOW, this::renderHand);

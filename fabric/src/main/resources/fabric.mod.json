@@ -16,6 +16,9 @@
     ],
     "client": [
       "lufurrius.musketmod.ClientSetup"
+    ],
+    "modmenu": [
+      "lufurrius.musketmod.ModMenuIntegration"
     ]
   },
   "accessWidener": "musketmod.aw",

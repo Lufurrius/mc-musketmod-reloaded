@@ -65,6 +65,7 @@ public class BulletEntity extends AbstractHurtingProjectile {
     public static final short LIFETIME = 100;
     public static final int HIT_PARTICLE_COUNT = 5;
     public static final float IGNITE_SECONDS = 5.0f;
+    public static final double MAX_TRACKED_SPEED = 32768.0;
 
     public float damage;
     public boolean touchedWater;
@@ -98,6 +99,10 @@ public class BulletEntity extends AbstractHurtingProjectile {
 
     public void discardOnNextTick() {
         tickCounter = LIFETIME;
+    }
+
+    private static boolean isFinite(Vec3 v) {
+        return Double.isFinite(v.x) && Double.isFinite(v.y) && Double.isFinite(v.z);
     }
 
     public float calculateEnergyFraction() {
@@ -139,6 +144,11 @@ public class BulletEntity extends AbstractHurtingProjectile {
     }
 
     @Override
+    public boolean shouldBeSaved() {
+        return false;
+    }
+
+    @Override
     public void tick() {
         if (++tickCounter > LIFETIME || distanceTravelled > Config.bulletMaxDistance) {
             discard();
@@ -148,8 +158,19 @@ public class BulletEntity extends AbstractHurtingProjectile {
         Level level = level();
 
         Vec3 velocity = getDeltaMovement();
+
+        if (!isFinite(velocity) || velocity.lengthSqr() > MAX_TRACKED_SPEED * MAX_TRACKED_SPEED) {
+            discard();
+            return;
+        }
+
         Vec3 from = position();
         Vec3 to = from.add(velocity);
+
+        if (!level.hasChunkAt(BlockPos.containing(from)) || !level.hasChunkAt(BlockPos.containing(to))) {
+            discard();
+            return;
+        }
 
         Vec3 waterPos = Vec3.ZERO;
         // updateFluidInteraction() refreshes the fluid state and sets wasTouchingWater;
