@@ -29,9 +29,9 @@ public class Items {
         .durability(Config.pistolDurability));
     public static final Item CARTRIDGE = new CartridgeItem(itemProperties("cartridge"));
 
-    public static final Identifier EMPTY_SLOT_MUSKET = MusketMod.resource("item/empty_slot_musket");
-    public static final Identifier EMPTY_SLOT_SPYGLASS = Identifier.withDefaultNamespace("item/empty_slot_spyglass");
-    public static final Identifier EMPTY_SLOT_SWORD = Identifier.withDefaultNamespace("item/empty_slot_sword");
+    public static final Identifier EMPTY_SLOT_MUSKET = MusketMod.resource("container/slot/musket");
+    public static final Identifier EMPTY_SLOT_SPYGLASS = MusketMod.resource("container/slot/spyglass");
+    public static final Identifier EMPTY_SLOT_SWORD = Identifier.withDefaultNamespace("container/slot/sword");
 
     public static final Item MUSKET_UPGRADE = new SmithingTemplateItem(
         Component.translatable(Util.makeDescriptionId("item",
