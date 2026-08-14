@@ -1,6 +1,6 @@
 plugins {
     // Minecraft 26.x is unobfuscated: use the non-remapping Loom plugin (fully-qualified id).
-    id 'net.fabricmc.fabric-loom' version '1.17-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
 }
 
 file("../gradle.properties").withInputStream {

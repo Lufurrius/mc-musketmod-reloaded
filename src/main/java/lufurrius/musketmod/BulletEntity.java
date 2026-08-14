@@ -27,7 +27,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.player.Player;
@@ -359,7 +358,7 @@ public class BulletEntity extends AbstractHurtingProjectile {
         }
 
         DamageSource source = getDamageSource();
-        boolean ignite = isOnFire() && target.getType() != EntityTypes.ENDERMAN;
+        boolean ignite = isOnFire() && target.getType() != EntityType.ENDERMAN;
 
         if (pelletCount() == 1) {
             if (headshot) {
