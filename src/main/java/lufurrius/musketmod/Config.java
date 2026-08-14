@@ -104,6 +104,8 @@ public class Config {
         pistolPillagerChance = PISTOL_PILLAGER_CHANCE;
         musketSkeletonChance = MUSKET_SKELETON_CHANCE;
 
+        alwaysAim = ALWAYS_AIM;
+
         damagePerPowerLevel = DAMAGE_PER_POWER_LEVEL;
 
         musketBulletStdDev = MUSKET_BULLET_STD_DEV;
@@ -144,7 +146,7 @@ public class Config {
                 int commentStart = line.indexOf('#');
                 if (commentStart != -1) line = line.substring(0, commentStart);
 
-                line.trim();
+                line = line.trim();
                 if (line.length() == 0) continue;
 
                 String errorPrefix = MusketMod.CONFIG_PATH+": line "+lineNumber+": ";
@@ -192,6 +194,10 @@ public class Config {
                         break;
                     case "musketSkeletonChance":
                         musketSkeletonChance = value;
+                        break;
+
+                    case "alwaysAim":
+                        alwaysAim = value != 0;
                         break;
 
                     case "damagePerPowerLevel":
@@ -329,6 +335,9 @@ public class Config {
             writer.write("pistolPillagerChance = "+pistolPillagerChance+"\n");
             writer.write("# Probability of Skeleton having a musket\n");
             writer.write("musketSkeletonChance = "+musketSkeletonChance+"\n");
+            writer.write("\n");
+            writer.write("# Aim always (1) or only when loaded (0)\n");
+            writer.write("alwaysAim = "+(alwaysAim ? 1 : 0)+"\n");
             writer.write("\n");
             writer.write("# Extra damage per Power enchantment level\n");
             writer.write("damagePerPowerLevel = "+damagePerPowerLevel+"\n");
